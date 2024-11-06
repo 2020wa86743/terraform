@@ -1,3 +1,4 @@
+[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12
 # Define the URL for the 7-Zip installer (64-bit version)
 $sevenZipUrl = "https://www.7-zip.org/a/7z1900-x64.exe"  # Update the URL if a newer version is available
 $installerPath = "$env:TEMP\7z1900-x64.exe"

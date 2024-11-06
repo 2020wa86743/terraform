@@ -1,5 +1,3 @@
-$LocalTempDir = $env:TEMP; $ChromeInstaller = "ChromeInstaller.exe"; (new-object    System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller"); & "$LocalTempDir\$ChromeInstaller" /silent /install; $Process2Monitor =  "ChromeInstaller"; Do { $ProcessesFound = Get-Process | ?{$Process2Monitor -contains $_.Name} | Select-Object -ExpandProperty Name; If ($ProcessesFound) { "Still running: $($ProcessesFound -join ', ')" | Write-Host; Start-Sleep -Seconds 2 } else { rm "$LocalTempDir\$ChromeInstaller" -ErrorAction SilentlyContinue -Verbose } } Until (!$ProcessesFound)
-
 # Define the URL for the 7-Zip installer (64-bit version)
 $sevenZipUrl = "https://www.7-zip.org/a/7z1900-x64.exe"  # Update the URL if a newer version is available
 $installerPath = "$env:TEMP\7z1900-x64.exe"
@@ -50,8 +48,21 @@ function Clean-Up {
     }
 }
 
+# Function to install chrome
+function Install-Chrome {
+    try {
+        $LocalTempDir = $env:TEMP; $ChromeInstaller = "ChromeInstaller.exe"; 
+        (new-object    System.Net.WebClient).DownloadFile('http://dl.google.com/chrome/install/375.126/chrome_installer.exe', "$LocalTempDir\$ChromeInstaller"); & "$LocalTempDir\$ChromeInstaller" /silent /install; $Process2Monitor =  "ChromeInstaller"; Do { $ProcessesFound = Get-Process | ?{$Process2Monitor -contains $_.Name} | Select-Object -ExpandProperty Name; If ($ProcessesFound) { "Still running: $($ProcessesFound -join ', ')" | Write-Host; Start-Sleep -Seconds 2 } else { rm "$LocalTempDir\$ChromeInstaller" -ErrorAction SilentlyContinue -Verbose } } Until (!$ProcessesFound)
+    } catch {
+        Write-Error "Failed to install Chrome"
+        exit 1
+    }
+}
+
+
 # Execute functions
 Download-Installer
 Install-7Zip
 Verify-Installation
 Clean-Up
+Install-Chrome
